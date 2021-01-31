@@ -111,6 +111,11 @@ func IsOpen() bool {
 	return false
 }
 
+// GetAdapter returns the adapter
+func GetAdapter() adapter.Adapter {
+	return adp
+}
+
 // GetAdapterName returns the name of the current adater.
 func GetAdapterName() string {
 	if adp != nil {
