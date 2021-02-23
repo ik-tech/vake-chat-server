@@ -1,0 +1,67 @@
+{
+	"listen": ":6060",
+	"api_path": "/",
+	"cache_control": 39600,
+	"static_mount": "/",
+	"grpc_listen": ":16060",
+	"api_key_salt": "qjVpzgaMUCQ5u3+IleVMUAKXu/v30k7UVeUOSMUd820=",
+	"max_message_size": 4194304,
+	"max_subscriber_count": 32,
+	"max_tag_count": 16,
+	"expvar": "/stats/expvar/",
+
+	"store_config": {
+		"uid_key": "la6YsO+bNX/+XIkOqc5Svw==",
+		"use_adapter": "cockroachdb",
+		"adapters": {
+			"cockroachdb": {
+				"database": "tinode",
+				"address": "localhost:26257",
+				"username": "tinode"
+			}
+		}
+	},
+	"media": {
+		"use_handler": "fs",
+		"max_size": 33554432,
+		"gc_period": 60,
+		"gc_block_size": 100,
+		"handlers": {
+			"fs": {
+				"upload_dir": "uploads"
+			}
+		}
+	},
+	"tls": {
+		"enabled": false
+	},
+	"auth_config": {
+		"logical_names": [],
+		"basic": {
+			"add_to_tags": true,
+			"min_login_length": 3,
+			"min_password_length": 6
+		},
+		"token": {
+			"expire_in": 1209600,
+			"serial_num": 1,
+			"key": "wfaY2RgF2S1OQI/ZlK+LSrp1KB2jwAdGAIHQ7JZn+Kc="
+		}
+	},
+	"push": [
+		{
+			"name":"tnpg",
+			"config": {
+				"enabled": false
+			}
+		},
+		{
+			"name":"fcm",
+			"config": {
+				"enabled": false
+			}
+		}
+	]
+
+
+}

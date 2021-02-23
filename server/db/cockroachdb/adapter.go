@@ -262,12 +262,12 @@ func (a *adapter) CreateDb(reset bool) error {
 	if _, err = a.db.Exec(
 		`CREATE TABLE users(
 			id        BIGINT NOT NULL,
-			createdat TIMESTAMP NOT NULL,
-			updatedat TIMESTAMP NOT NULL,
+			createdat TIMESTAMP(3) NOT NULL,
+			updatedat TIMESTAMP(3) NOT NULL,
 			state     SMALLINT NOT NULL DEFAULT 0,
-			stateat   TIMESTAMP,
+			stateat   TIMESTAMP(3),
 			access    JSON,
-			lastseen  TIMESTAMP,
+			lastseen  TIMESTAMP(3),
 			useragent VARCHAR(255) DEFAULT '',
 			public    JSON,
 			tags      JSON,
@@ -306,10 +306,10 @@ func (a *adapter) CreateDb(reset bool) error {
 		`CREATE TABLE devices(
 			id       INT NOT NULL default nextval('devices_seq'),
 			userid   BIGINT NOT NULL,
-			hash     CHAR(16) NOT NULL,
+			hash     CHAR VARYING(16) NOT NULL,
 			deviceid TEXT NOT NULL,
 			platform VARCHAR(32),
-			lastseen TIMESTAMP NOT NULL,
+			lastseen TIMESTAMP(3) NOT NULL,
 			lang     VARCHAR(8),
 			CONSTRAINT "primary" PRIMARY KEY(id),
 			FOREIGN KEY(userid) REFERENCES users(id),
@@ -332,7 +332,7 @@ func (a *adapter) CreateDb(reset bool) error {
 			scheme  VARCHAR(16) NOT NULL,
 			authlvl SMALLINT NOT NULL,
 			secret  VARCHAR(255) NOT NULL,
-			expires TIMESTAMP,
+			expires TIMESTAMP(3),
 			CONSTRAINT "primary" PRIMARY KEY(id),
 			FOREIGN KEY(userid) REFERENCES users(id),
 			UNIQUE INDEX auth_userid_scheme(userid, scheme),
@@ -350,12 +350,12 @@ func (a *adapter) CreateDb(reset bool) error {
 	if _, err = a.db.Exec(
 		`CREATE TABLE topics(
 			id        INT NOT NULL default nextval('topics_seq'),
-			createdat TIMESTAMP NOT NULL,
-			updatedat TIMESTAMP NOT NULL,
+			createdat TIMESTAMP(3) NOT NULL,
+			updatedat TIMESTAMP(3) NOT NULL,
 			state     SMALLINT NOT NULL DEFAULT 0,
-			stateat   TIMESTAMP,
-			touchedat TIMESTAMP,
-			name      CHAR(25) NOT NULL,
+			stateat   TIMESTAMP(3),
+			touchedat TIMESTAMP(3),
+			name      CHAR VARYING(25) NOT NULL,
 			usebt     BOOL DEFAULT false,
 			owner     BIGINT NOT NULL DEFAULT 0,
 			access    JSON,
@@ -392,7 +392,7 @@ func (a *adapter) CreateDb(reset bool) error {
 	if _, err = a.db.Exec(
 		`CREATE TABLE topictags(
 			id    INT NOT NULL default nextval('topictags_seq'),
-			topic CHAR(25) NOT NULL,
+			topic CHAR VARYING (25) NOT NULL,
 			tag   VARCHAR(96) NOT NULL,
 			CONSTRAINT "primary" PRIMARY KEY(id),
 			FOREIGN KEY(topic) REFERENCES topics(name),
@@ -411,11 +411,11 @@ func (a *adapter) CreateDb(reset bool) error {
 	if _, err = a.db.Exec(
 		`CREATE TABLE subscriptions(
 			id        INT NOT NULL default nextval('subscriptions_seq'),
-			createdat TIMESTAMP NOT NULL,
-			updatedat TIMESTAMP NOT NULL,
-			deletedat TIMESTAMP,
+			createdat TIMESTAMP(3) NOT NULL,
+			updatedat TIMESTAMP(3) NOT NULL,
+			deletedat TIMESTAMP(3),
 			userid    BIGINT NOT NULL,
-			topic     CHAR(25) NOT NULL,
+			topic     CHAR VARYING(25) NOT NULL,
 			delid     INT DEFAULT 0,
 			recvseqid INT DEFAULT 0,
 			readseqid INT DEFAULT 0,
@@ -440,12 +440,12 @@ func (a *adapter) CreateDb(reset bool) error {
 	if _, err = a.db.Exec(
 		`CREATE TABLE messages(
 			id        INT NOT NULL default nextval('messages_seq'),
-			createdat TIMESTAMP NOT NULL,
-			updatedat TIMESTAMP NOT NULL,
-			deletedat TIMESTAMP,
+			createdat TIMESTAMP(3) NOT NULL,
+			updatedat TIMESTAMP(3) NOT NULL,
+			deletedat TIMESTAMP(3),
 			delid     INT DEFAULT 0,
 			seqid     INT NOT NULL,
-			topic     CHAR(25) NOT NULL,
+			topic     CHAR VARYING(25) NOT NULL,
 			"from"    BIGINT NOT NULL,
 			head      JSON,
 			content   JSON,
@@ -488,9 +488,9 @@ func (a *adapter) CreateDb(reset bool) error {
 	if _, err = a.db.Exec(
 		`CREATE TABLE credentials(
 			id        INT NOT NULL default nextval('credentials_seq'),
-			createdat TIMESTAMP NOT NULL,
-			updatedat TIMESTAMP NOT NULL,
-			deletedat TIMESTAMP,
+			createdat TIMESTAMP(3) NOT NULL,
+			updatedat TIMESTAMP(3) NOT NULL,
+			deletedat TIMESTAMP(3),
 			"method"  VARCHAR(16) NOT NULL,
 			value     VARCHAR(128) NOT NULL,
 			synthetic VARCHAR(192) NOT NULL,
@@ -510,8 +510,8 @@ func (a *adapter) CreateDb(reset bool) error {
 	if _, err = a.db.Exec(
 		`CREATE TABLE fileuploads(
 			id        BIGINT NOT NULL,
-			createdat TIMESTAMP NOT NULL,
-			updatedat TIMESTAMP NOT NULL,	
+			createdat TIMESTAMP(3) NOT NULL,
+			updatedat TIMESTAMP(3) NOT NULL,	
 			userid    BIGINT NOT NULL,
 			status    INT NOT NULL,
 			mimetype  VARCHAR(255) NOT NULL,
@@ -531,7 +531,7 @@ func (a *adapter) CreateDb(reset bool) error {
 	if _, err = a.db.Exec(
 		`CREATE TABLE filemsglinks(
 			id        INT NOT NULL default nextval('filemsglinks_seq'),
-			createdat TIMESTAMP NOT NULL,
+			createdat TIMESTAMP(3) NOT NULL,
 			fileid    BIGINT NOT NULL,
 			msgid     INT NOT NULL,
 			CONSTRAINT "primary" PRIMARY KEY(id),
@@ -543,7 +543,7 @@ func (a *adapter) CreateDb(reset bool) error {
 
 	if _, err = a.db.Exec(
 		`CREATE TABLE kvmeta(
-			key CHAR(32), 
+			key CHAR VARYING(32), 
 			value TEXT,
 			CONSTRAINT "primary" PRIMARY KEY(key)
 		)`); err != nil {

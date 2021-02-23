@@ -15,6 +15,7 @@ import (
 	_ "github.com/tinode/chat/server/db/mongodb"
 	_ "github.com/tinode/chat/server/db/mysql"
 	_ "github.com/tinode/chat/server/db/rethinkdb"
+	_ "github.com/tinode/chat/server/db/cockroachdb"
 	"github.com/tinode/chat/server/store"
 	jcr "github.com/tinode/jsonco"
 )

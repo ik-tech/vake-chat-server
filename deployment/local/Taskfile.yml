@@ -1,0 +1,90 @@
+# https://taskfile.dev
+
+version: '3'
+
+# silent: true
+
+vars:
+  PRJ_DIR: "../.."
+  OUT_DIR: "./server"
+  WEBOUT_DIR: "{{.OUT_DIR}}/static"
+  # WEBSRV_DIR: "../tinide-js"
+  WEBSRV_DIR: "{{.PRJ_DIR}}/../sources/tinode/webapp"
+  DB_ADAPTER: cockroachdb
+
+tasks:
+  default:
+    desc: run server
+    deps: [prep-config]
+    dir: "{{.OUT_DIR}}"
+    cmds:
+    - echo RUN SERVER
+    - ./tinode -config=./tinode.conf -static_data=./static
+
+  init-db:
+    desc: prepare server to run
+    deps: [prep-config]
+    dir: "{{.OUT_DIR}}"
+    cmds:
+    - ./init-db -config=./tinode.conf -data=./data.json
+    - echo INIT DB
+
+  prep-config: cp ./config/tinode.json {{.OUT_DIR}}/tinode.conf
+
+  deploy:
+    desc: build server and tools, copy resources
+    cmds: 
+    - task: build-all
+    - task: copy-static
+    - echo "DONE"
+
+  build:
+    desc: build server
+    cmds:
+    - CGO_ENABLED=0 GOOS=linux go build -ldflags "-X main.buildstamp=`date -u '+%Y%m%dT%H:%M:%SZ'`" -tags "{{.DB_ADAPTER}}" -o {{.OUT_DIR}}/tinode {{.PRJ_DIR}}/server
+
+  build-all:
+    desc: build tools
+    deps: [build]
+    cmds:
+    - CGO_ENABLED=0 GOOS=linux go build -o {{.OUT_DIR}}/keygen {{.PRJ_DIR}}/keygen
+    - CGO_ENABLED=0 GOOS=linux go build -tags "{{.DB_ADAPTER}}" -o {{.OUT_DIR}}/init-db {{.PRJ_DIR}}/tinode-db
+
+  copy-static:
+    desc: copy static resources
+    deps: [create-folders]
+    cmds:
+    - cp {{.PRJ_DIR}}/server/templ/*.templ {{.OUT_DIR}}/templ
+    - cp {{.PRJ_DIR}}/tinode-db/data.json {{.OUT_DIR}}
+    - cp {{.PRJ_DIR}}/tinode-db/*.jpg {{.OUT_DIR}}
+    - cp {{.PRJ_DIR}}/tinode-db/credentials.sh {{.OUT_DIR}}
+    - cp {{.WEBSRV_DIR}}/img/*.png {{.WEBOUT_DIR}}/img
+    - cp {{.WEBSRV_DIR}}/img/*.svg {{.WEBOUT_DIR}}/img
+    - cp {{.WEBSRV_DIR}}/audio/*.mp3 {{.WEBOUT_DIR}}/audio
+    - cp {{.WEBSRV_DIR}}/css/*.css {{.WEBOUT_DIR}}/css
+    - cp {{.WEBSRV_DIR}}/index.html {{.WEBOUT_DIR}}
+    - cp {{.WEBSRV_DIR}}/index-dev.html {{.WEBOUT_DIR}}
+    - cp {{.WEBSRV_DIR}}/umd/*.js {{.WEBOUT_DIR}}/umd
+    - cp {{.WEBSRV_DIR}}/manifest.json {{.WEBOUT_DIR}}
+    - cp {{.WEBSRV_DIR}}/service-worker.js {{.WEBOUT_DIR}}
+    - echo > {{.WEBOUT_DIR}}/firebase-init.js
+
+
+  create-folders:
+    desc: prepare folder structure
+    cmds:
+    - mkdir -p {{.OUT_DIR}}
+    - mkdir -p {{.OUT_DIR}}/templ
+    - mkdir -p {{.OUT_DIR}}/static/img
+    - mkdir -p {{.OUT_DIR}}/static/css
+    - mkdir -p {{.OUT_DIR}}/static/audio
+    - mkdir -p {{.OUT_DIR}}/static/src
+    - mkdir -p {{.OUT_DIR}}/static/umd
+    status:
+    - test -d {{.OUT_DIR}}
+    - test -d {{.OUT_DIR}}/templ
+    - test -d {{.WEBOUT_DIR}}/img
+    - test -d {{.WEBOUT_DIR}}/css
+    - test -d {{.WEBOUT_DIR}}/audio
+    - test -d {{.WEBOUT_DIR}}/src
+    - test -d {{.WEBOUT_DIR}}/umd
